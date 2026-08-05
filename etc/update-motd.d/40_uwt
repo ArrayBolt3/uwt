@@ -5,6 +5,13 @@
 
 ## Feel free to delete this file.
 
+set -o errexit
+set -o nounset
+set -o pipefail
+set -o errtrace
+shopt -s inherit_errexit
+shopt -s shift_verbose
+
 ## Output uwt settings.
 ## https://phabricator.whonix.org/T73
 if test -x /usr/bin/uwt-settings-show ; then
