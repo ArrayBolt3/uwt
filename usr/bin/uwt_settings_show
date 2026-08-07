@@ -13,6 +13,8 @@ shopt -s shift_verbose
 shopt -s nullglob
 for i in /etc/uwt.d/*.conf /usr/local/etc/uwt.d/*.conf; do
    bash -n "${i}"
+   ## Dynamic path from the glob above; R-081 prescribes SC1090 here.
+   # shellcheck disable=SC1090
    source "${i}"
 done
 
