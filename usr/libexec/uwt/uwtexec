@@ -22,11 +22,13 @@ set -o errtrace
 shopt -s inherit_errexit
 shopt -s shift_verbose
 
-## All three are exported by uwtwrapper. Read them nounset-safely: a bare read
-## would abort here and the wrapped program would never run at all.
+## uwtwrapper exports all three. The verbose flag is optional and defaults to
+## empty. The zeroarg and parent values are required: validate them fail-closed
+## so a missing export aborts with a clear message instead of exec'ing a bogus
+## '.anondist-orig' path with an empty argv[0].
 uwtwrapper_verbose="${uwtwrapper_verbose:-}"
-uwtwrapper_zeroarg="${uwtwrapper_zeroarg:-}"
-uwtwrapper_parent="${uwtwrapper_parent:-}"
+: "${uwtwrapper_zeroarg:?uwtwrapper_zeroarg is required}"
+: "${uwtwrapper_parent:?uwtwrapper_parent is required}"
 
 if [ ! "${uwtwrapper_verbose}" = "" ]; then
    if [ "${uwtwrapper_verbose}" -ge 1 ]; then
