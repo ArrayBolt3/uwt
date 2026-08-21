@@ -65,6 +65,7 @@ set -o pipefail
 set -o errtrace
 shopt -s inherit_errexit
 shopt -s shift_verbose
+export LC_ALL=C
 
 ## Every one of these is supplied by the caller's environment or by an
 ## /etc/uwt.d config file, and any of them can legitimately be absent. Give
@@ -100,15 +101,10 @@ fi
 
 true "${0}: START"
 
-## shellcheck cannot follow this in an isolated single-repo checkout, where
-## helper-scripts is not a sibling; the source= path documents where the file
-## lives in the derivative-maker tree.
 # shellcheck source=../../../../../kicksecure/helper-scripts/usr/libexec/helper-scripts/strings.bsh
-# shellcheck disable=SC1091
-source /usr/libexec/helper-scripts/strings.bsh
+source "${HELPER_SCRIPTS_PATH:-}"/usr/libexec/helper-scripts/strings.bsh
 # shellcheck source=../../../../../kicksecure/helper-scripts/usr/libexec/helper-scripts/has.sh
-# shellcheck disable=SC1091
-source /usr/libexec/helper-scripts/has.sh
+source "${HELPER_SCRIPTS_PATH:-}"/usr/libexec/helper-scripts/has.sh
 
 ## Set before the ERR trap is installed: the handler reads it, so an error
 ## raised in between would otherwise report an unset variable instead of the
