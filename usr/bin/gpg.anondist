@@ -9,5 +9,16 @@
 #### description
 #### meta end
 
+## style-ok: allow-exec -- transparent wrapper: the wrapped program must
+## replace this process so its exit code, signals and stdio are the real
+## ones the caller sees.
+
+set -o errexit
+set -o nounset
+set -o pipefail
+set -o errtrace
+shopt -s inherit_errexit
+shopt -s shift_verbose
+
 export uwtwrapper_parent="${BASH_SOURCE[0]}"
 exec /usr/libexec/uwt/uwtwrapper "$@"
