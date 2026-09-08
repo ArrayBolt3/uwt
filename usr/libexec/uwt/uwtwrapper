@@ -96,8 +96,6 @@ fi
 
 true "${0}: START"
 
-# shellcheck source=../../../../../kicksecure/helper-scripts/usr/libexec/helper-scripts/strings.bsh
-source "${HELPER_SCRIPTS_PATH:-}"/usr/libexec/helper-scripts/strings.bsh
 # shellcheck source=../../../../../kicksecure/helper-scripts/usr/libexec/helper-scripts/has.sh
 source "${HELPER_SCRIPTS_PATH:-}"/usr/libexec/helper-scripts/has.sh
 
