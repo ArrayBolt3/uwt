@@ -18,38 +18,33 @@
 ## style-ok: allow-exec -- transparent wrapper.
 
 ## provides was_executed
-# shellcheck source=../../../helper-scripts/usr/libexec/helper-scripts/check_runtime.bsh
+# shellcheck source=../../../../kicksecure/helper-scripts/usr/libexec/helper-scripts/check_runtime.bsh
 source "${HELPER_SCRIPTS_PATH:-}"/usr/libexec/helper-scripts/check_runtime.bsh || true
 if ! declare -F was_executed >/dev/null; then
   printf '%s\n' "$0: ERROR: cannot source check_runtime.bsh!" >&2
-  ## return (not exit) when sourced so a test harness is not terminated.
-  return 1 2>/dev/null || exit 1
+  exit 1
 fi
 
-## Split into a function so tests can override it.
+# shellcheck source=../../../../kicksecure/helper-scripts/usr/libexec/helper-scripts/manage_lc_all_c.bsh
+source "${HELPER_SCRIPTS_PATH:-}"/usr/libexec/helper-scripts/manage_lc_all_c.bsh
+
 exec_uwtwrapper() {
-  ## Restore the caller's LC_ALL (saved in main before forcing C) so the wrapped
-  ## application runs under the caller's locale, not uwt's internal C.
-  if [ -n "${uwt_caller_lc_all:-}" ]; then
-    export LC_ALL="${uwt_caller_lc_all}"
-  else
-    unset LC_ALL
-  fi
+  disable_lc_all_c
   exec /usr/libexec/uwt/uwtwrapper "$@"
 }
 
 main() {
-  ## Save the caller's LC_ALL before forcing C, so exec_uwtwrapper can restore it.
-  uwt_caller_lc_all="${LC_ALL:-}"
-
   set -o errexit
   set -o nounset
   set -o pipefail
   set -o errtrace
   shopt -s inherit_errexit
   shopt -s shift_verbose
-  export LC_ALL=C
 
+  enable_lc_all_c
+
+## ALIGN COMMENT POIUPOIUOPIU
+## ALIGN COMMENT POIUPOIUOPIU
   export TOR_CONTROL_HOST="127.0.0.1"
   export TOR_CONTROL_PORT="9151"
 
