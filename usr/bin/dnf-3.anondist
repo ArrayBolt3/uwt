@@ -20,15 +20,18 @@
 source "${HELPER_SCRIPTS_PATH:-}"/usr/libexec/helper-scripts/check_runtime.bsh || true
 if ! declare -F was_executed >/dev/null; then
   printf '%s\n' "$0: ERROR: cannot source check_runtime.bsh!" >&2
-  exit 1
+  ## return (not exit) when sourced so a test harness is not terminated.
+  return 1 2>/dev/null || exit 1
 fi
 
-## NOTE: Duplicated in package 'helper-scripts' file 'strings.sh'.
-random_alpha_numeric() {
-  local n="${1:-43}"
-  LC_ALL=C tr -dc 'A-Za-z0-9' < /dev/random | head --bytes="$n" || true
-  printf '%s\n' ""
-}
+## provides random_alpha_numeric
+# shellcheck source=../../../helper-scripts/usr/libexec/helper-scripts/strings.bsh
+source "${HELPER_SCRIPTS_PATH:-}"/usr/libexec/helper-scripts/strings.bsh || true
+if ! declare -F random_alpha_numeric >/dev/null; then
+  printf '%s\n' "$0: ERROR: cannot source strings.bsh!" >&2
+  ## return (not exit) when sourced so a test harness is not terminated.
+  return 1 2>/dev/null || exit 1
+fi
 
 ## Split into a function so tests can override it.
 run_tor_wait_direct() {
@@ -126,7 +129,11 @@ main() {
   fi
 
   if [ -n "${curl_binary}" ]; then
-    if ! "${curl_binary}" "http://127.0.0.1:9050/" --output /dev/null 2>/dev/null; then
+    ## Probe the local Tor port DIRECTLY: --disable (first arg) ignores ~/.curlrc
+    ## and --noproxy '*' overrides any proxy env var (ALL_PROXY/http_proxy/...)
+    ## so user config cannot spuriously fail it and drop stream isolation;
+    ## 'timeout' hard-caps a wedged probe (stronger than curl's own --max-time).
+    if ! timeout --kill-after=10 10 "${curl_binary}" --disable --noproxy '*' "http://127.0.0.1:9050/" --output /dev/null 2>/dev/null; then
       #printf '%s\n' "WARNING: Tor proxy doesn't seem to be functional. Stream isolation will be disabled." 1>&2
       disable_stream_isolation='true'
     fi
